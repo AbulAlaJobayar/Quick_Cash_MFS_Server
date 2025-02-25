@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import notFound from './app/middleware/notFound';
+import router from './app/route';
 
 const app: Application = express();
 // middleware
@@ -20,7 +21,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // routes
-
+app.use('/api/v1', router);
 app.get('/', (req: Request, res: Response) => {
   res.send('Quick Cash is Up');
 });
