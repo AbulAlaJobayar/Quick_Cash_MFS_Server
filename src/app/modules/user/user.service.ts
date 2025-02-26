@@ -40,7 +40,7 @@ const createUserIntoDB = async (payload: IUser) => {
 
 //get all users from db
 const getUsersFromDB = async () => {
-  const result = await User.aggregate([{ $match: { status: 'approved' } }]);
+  const result = await User.aggregate([{ $match: { status: 'approved' } }, { $project: { pin: 0 } }]);
   if (!result) {
     throw new AppError(
       httpStatus.INTERNAL_SERVER_ERROR,

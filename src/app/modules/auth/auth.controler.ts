@@ -32,50 +32,71 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
     data: null,
   });
 });
-const refreshToken = catchAsync(async (req:Request, res:Response) => {
-    const { refreshToken } = req.cookies;
-    const result = await AuthServices.refreshToken(refreshToken);
-  
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Access token is retrieved successfully!',
-      data: result,
-    });
-  });
+const refreshToken = catchAsync(async (req: Request, res: Response) => {
+  const { refreshToken } = req.cookies;
+  const result = await AuthServices.refreshToken(refreshToken);
 
-  const forgetPassword = catchAsync(async (req:Request, res:Response) => {
-    const {id} = req.body;
-    const result = await AuthServices.forgatPassword(id);
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Reset link is generated successfully!',
-      data: result,
-    });
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Access token is retrieved successfully!',
+    data: result,
   });
+});
 
-
-  const resetPassword = catchAsync(async (req, res) => {
-    const token = req.headers.authorization;
-  
-    if (!token) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Something went wrong !');
-    }
-  
-    const result = await AuthServices.resetPassword(req.body, token);
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Password reset successfully!',
-      data: result,
-    });
+const forgetPassword = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.body;
+  const result = await AuthServices.forgatPassword(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message:
+      'Reset link is generated successfully please open your Email Account!',
+    data: result,
   });
+});
+
+const resetPassword = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Something went wrong !');
+  }
+
+  const result = await AuthServices.resetPassword(req.body, token);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Password reset successfully!',
+    data: result,
+  });
+});
+const removeFromAllDevice = catchAsync(async (req, res) => {
+  const result = await AuthServices.removeFromAllDevice(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'You are Logout From All Devices',
+    data: result,
+  });
+});
+const  LogOutFromDevice  = catchAsync(async (req, res) => {
+  const {id}=req.user
+  const result = await AuthServices.LogOutFromDevice(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'You are Logout ',
+    data: result,
+  });
+});
 
 export const AuthControllers = {
   loginUser,
   changePassword,
   refreshToken,
   forgetPassword,
-  resetPassword
+  resetPassword,
+  removeFromAllDevice,
+  LogOutFromDevice 
 };

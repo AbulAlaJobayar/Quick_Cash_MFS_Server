@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { UserController } from './user.controller';
 import validateRequest from '../../middleware/validateRequest';
 import { UserValidation } from './user.validation';
+import auth, { USER_ROLE } from '../../middleware/auth';
 
 const router = Router();
 
@@ -10,8 +11,10 @@ router.post(
   validateRequest(UserValidation.createUserSchema),
   UserController.createUserIntoDB,
 );
+// auth(USER_ROLE.admin),
 router.get('/', UserController.getUsersFromDB);
-router.get('/:id', UserController.getUserByIdFromDB);
+router.get('/:id',auth(USER_ROLE.admin,USER_ROLE.agent,USER_ROLE.user), UserController.getUserByIdFromDB);
 router.post('/delete_user', UserController.bulkDeleteFromDB)
-router.put('/:id', UserController.bulkDeleteFromDB)
+
+//todo: router.put('/:id', UserController.bulkDeleteFromDB)
 export const userRoutes = router;

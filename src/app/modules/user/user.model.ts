@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { IUser } from './user.interface';
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 import config from '../../config';
 
 const userSchema = new Schema<IUser>(
@@ -57,13 +57,17 @@ const userSchema = new Schema<IUser>(
 
 // Hash PIN before saving a new user
 userSchema.pre('save', async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this; // doc
-  // hashing password and save into DB
-  user.pin = await bcrypt.hash(
-    user.pin,
-    Number(config.bcrypt_salt_rounds),
-  );
+  // console.log('Original PIN:', user.pin); // Debug log
+  // console.log('Salt Rounds:', config.bcrypt_salt_rounds); // Debug log
+
+  if (user.isModified('pin')) {
+    user.pin = await bcrypt.hash(
+      user.pin.trim(), // Trim whitespace
+      Number(config.bcrypt_salt_rounds),
+    );
+    // console.log('Hashed PIN:', user.pin); // Debug log
+  }
   next();
 });
 
