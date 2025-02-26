@@ -9,6 +9,7 @@ import { User } from './user.model';
 const createUserIntoDB = async (payload: IUser) => {
   // Create user
   const user = await User.create(payload);
+  console.log(user)
   if (!user) {
     throw new AppError(
       httpStatus.INTERNAL_SERVER_ERROR,
@@ -73,7 +74,7 @@ const bulkDeleteFromDB = async (id: string) => {
 const updateUserById = async (payload: Partial<IUser>, id: string) => {
   const user = await User.findByIdAndUpdate({ _id: id }, payload, {
     new: true,
-    runValidators:true
+    runValidators: true,
   }).select('-pin');
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not Found');
@@ -85,5 +86,5 @@ export const userService = {
   getUsersFromDB,
   getUserByIdFromDB,
   bulkDeleteFromDB,
-  updateUserById
+  updateUserById,
 };

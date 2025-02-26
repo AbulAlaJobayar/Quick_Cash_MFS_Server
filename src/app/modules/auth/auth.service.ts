@@ -11,16 +11,22 @@ import { sendEmail } from '../../utils/sendEmail';
 //login
 const userLogin = async (payload: TLoginSchema) => {
   const user = await User.findOne({ mobileNumber: payload.mobileNumber });
+ 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not Found');
   }
   if (user.status === 'blocked') {
     throw new AppError(httpStatus.NOT_FOUND, 'User Not Found ');
   }
-  const isPasswordMatched = await bcrypt.compare(payload.pin, user.pin);
+  console.log("hash",user.pin)
+  console.log("payload",payload.pin)
+  const isPasswordMatched =await bcrypt.compare(payload.pin,user.pin);
+  
+  console.log({isPasswordMatched})
   if (!isPasswordMatched) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
   }
+ 
   const tokenData: TJwtPayload = {
     id: user._id,
     email: user.email,

@@ -17,7 +17,6 @@ const userSchema = new Schema<IUser>(
     },
     pin: {
       type: String,
-      select:false,
       required: [true, 'Please input your PIN '],
     },
     mobileNumber: {
