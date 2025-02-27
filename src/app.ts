@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import notFound from './app/middleware/notFound';
 import router from './app/route';
+import globalErrorHandler from './app/middleware/globalErrorhandler';
 
 const app: Application = express();
 // middleware
@@ -25,7 +26,7 @@ app.use('/api/v1', router);
 app.get('/', (req: Request, res: Response) => {
   res.send('Quick Cash is Up');
 });
-
+app.use(globalErrorHandler);
 //Not found Route
 app.use(notFound);
 export default app;

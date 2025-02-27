@@ -1,9 +1,10 @@
-import { model, Schema, Types} from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 import { INotification } from './notification.interface';
 
 const notificationSchema = new Schema<INotification>(
   {
-    userId: { type:Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    transactionId: { type: String, required: true },
     message: { type: String, required: true },
     isRead: { type: Boolean, default: false },
   },

@@ -91,19 +91,22 @@ const sendMoney = async (id: string, payload: TTransaction) => {
     // Notify the sender
     await createNotification(
       sender._id.toString(),
-      `You sent ${amount} taka to Name:${recipient.name}- Mobile:${recipient.mobileNumber}. Fee: ${fee} taka.`,
+      transactionId,
+      `You sent ${amount} taka to ${recipient.mobileNumber}. Fee: ${fee} taka.`,
     );
 
     // Notify the recipient
 
     await createNotification(
       recipient._id.toString(),
-      `You received ${amount} taka from Name:${sender.name} ${sender.accountType}- Mobile:${sender.mobileNumber}.`,
+      transactionId,
+      `You received ${amount} taka from ${sender.mobileNumber}.`,
     );
     // Notify the admin
     await createNotification(
       admin._id.toString(),
-      `Transaction ID: ${transactionId} - NAme:${sender.name} Mobile:${sender.mobileNumber}sent ${amount} Taka to Name:${recipient.name}  Mobile:${recipient.name}. you received ${fee} Taka as a Admin fee.`,
+      transactionId,
+      `Transaction ID: ${transactionId} -${sender.mobileNumber}sent ${amount} Taka to  Mobile:${recipient.mobileNumber}. you received ${fee} Taka as a Admin fee.`,
     );
   } catch (error) {
     // Abort the transaction if any operation fails
@@ -180,19 +183,22 @@ const cashIn = async (id: string, payload: TTransaction) => {
     // Notify the sender
     await createNotification(
       sender._id.toString(),
-      `You cashIn ${amount} taka to Name: ${recipient.name}  Mobile:${recipient.mobileNumber}. Fee: ${fee} taka.`,
+      transactionId,
+      `You send cashIn ${amount} taka to ${recipient.mobileNumber}. Fee: ${fee} taka.`,
     );
 
     // Notify the recipient
 
     await createNotification(
       recipient._id.toString(),
-      `You cashIn from ${amount} taka from  Name:${recipient.name} ${sender.accountType} -Mobile:${sender.mobileNumber}.`,
+      transactionId,
+      `You received cashIn from ${amount} taka from ${sender.mobileNumber}.`,
     );
     // Notify the admin
     await createNotification(
       admin._id.toString(),
-      `Transaction ID: ${transactionId} - Name:${sender.name} Mobile:${sender.mobileNumber} sent ${amount} Taka to Name:${recipient.name} Mobile:${recipient.mobileNumber}. you received ${fee} Taka as a fee.`,
+      transactionId,
+      `Transaction ID: ${transactionId} - ${sender.mobileNumber} sent ${amount} Taka to ${recipient.mobileNumber}. you received ${fee} Taka as a fee.`,
     );
   } catch (error) {
     // Abort the transaction if any operation fails
@@ -291,19 +297,22 @@ const cashOut = async (id: string, payload: TTransaction) => {
     // Notify the sender
     await createNotification(
       sender._id.toString(),
-      `You cashed out ${amount} taka to Name:${recipient.name} Mobile:${recipient.mobileNumber}. CashOut Charge: ${cashoutCharge} taka.`,
+      transactionId,
+      `You cashed out ${amount} taka to ${recipient.mobileNumber}. CashOut Charge: ${cashoutCharge} taka.`,
     );
 
     // Notify the recipient (agent)
     await createNotification(
       recipient._id.toString(),
-      `You received ${amount} taka from Name:${sender.name} Mobile:${sender.mobileNumber}. Agent Fee: ${agentFee} taka.`,
+      transactionId,
+      `You received ${amount} taka from ${sender.mobileNumber}. Agent Fee: ${agentFee} taka.`,
     );
 
     // Notify the admin
     await createNotification(
       admin._id.toString(),
-      `Transaction ID: ${transactionId} - Name:${sender.name} -Mobile:${sender.mobileNumber} cashed out ${amount} Taka to Name:${recipient.name}- Mobile:${recipient.mobileNumber}. You received ${adminFee} Taka as a Admen fee.`,
+      transactionId,
+      `Transaction ID: ${transactionId} - ${sender.mobileNumber} cashed out ${amount} Taka to ${recipient.mobileNumber}. You received ${adminFee} Taka as a Admen fee.`,
     );
   } catch (error) {
     // Abort the transaction if any operation fails
