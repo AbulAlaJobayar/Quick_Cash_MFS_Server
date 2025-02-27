@@ -4,12 +4,17 @@ import AppError from '../../errors/AppError';
 import { createToken, TJwtPayload } from '../../utils/tokenUtils';
 import { IUser } from './user.interface';
 import { User } from './user.model';
+import { v4 as uuidv4 } from 'uuid';
 
 //createUserIntoDB
 const createUserIntoDB = async (payload: IUser) => {
-  // Create user
+
+ // Update sessionId after user creation
+  const sessionId = uuidv4();
+  payload.sessionId = sessionId;
+    // Create user
   const user = await User.create(payload);
-  console.log(user)
+  console.log(user);
   if (!user) {
     throw new AppError(
       httpStatus.INTERNAL_SERVER_ERROR,
@@ -19,9 +24,8 @@ const createUserIntoDB = async (payload: IUser) => {
   // Create JWT Token
   const tokenData: TJwtPayload = {
     id: user._id,
-    email: user.email,
+    sessionId,
     mobileNumber: user.mobileNumber,
-    nid: user.nid,
     role: user.accountType,
   };
 
@@ -30,17 +34,16 @@ const createUserIntoDB = async (payload: IUser) => {
     config.jwt_access_secret,
     config.jwt_access_expires_in,
   );
-
-  // Update sessionId after user creation
-  user.sessionId = accessToken;
-  await user.save(); // Save the updated sessionId
   const result = await User.findById({ _id: user._id }).select('-pin');
   return { result, accessToken };
 };
 
 //get all users from db
 const getUsersFromDB = async () => {
-  const result = await User.aggregate([{ $match: { status: 'approved' } }, { $project: { pin: 0 } }]);
+  const result = await User.aggregate([
+    { $match: { status: 'approved' } },
+    { $project: { pin: 0 } },
+  ]);
   if (!result) {
     throw new AppError(
       httpStatus.INTERNAL_SERVER_ERROR,

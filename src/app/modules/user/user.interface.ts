@@ -8,8 +8,9 @@ export interface IUser {
   accountType: 'user' | 'agent' | 'admin';
   nid: string;
   balance: number;
+  bonus:number;
   status: 'blocked' | 'approved';
-  sessionId: string | null;
+  sessionId: string ;
 }
 
 

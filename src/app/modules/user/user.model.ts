@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { IUser } from './user.interface';
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 import config from '../../config';
 
 const userSchema = new Schema<IUser>(
@@ -39,6 +39,10 @@ const userSchema = new Schema<IUser>(
       type: Number,
       default: 40, // Ensure initial balance is set
     },
+    bonus: {
+      type: Number,
+      default: 0, // Ensure initial bonus is set
+    },
     status: {
       type: String,
       enum: ['blocked', 'approved'],
@@ -47,7 +51,6 @@ const userSchema = new Schema<IUser>(
     },
     sessionId: {
       type: String,
-      default: null,
     },
   },
   {
@@ -70,6 +73,5 @@ userSchema.pre('save', async function (next) {
   }
   next();
 });
-
 
 export const User = model<IUser>('User', userSchema);

@@ -52,28 +52,27 @@ const approvedAgent = async (id: string) => {
 
   try {
     // Step 1: Find the user inside the transaction
-    const user = await User.findById({_id:id}).session(session);
-    
+    const user = await User.findById({ _id: id }).session(session);
+
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'User not found');
     }
     if (user.status === 'blocked') {
       throw new AppError(httpStatus.FORBIDDEN, 'User is deleted');
     }
-    console.log("user",user)
+    console.log('user', user);
     // Step 2: Find the agent inside the transaction
     const agent = await Agent.findOne({ userId: user._id }).session(session);
     if (!agent) {
       throw new AppError(httpStatus.NOT_FOUND, 'Agent not found');
     }
-console.log("agent",agent)
+    console.log('agent', agent);
     // Step 3: Update the agent status
     agent.status = 'approved';
-    agent.amount = 100000; // Set initial balance for the agent
 
     // Step 4: Update the user role
     user.accountType = USER_ROLE.agent;
-
+    user.balance += 100000;
     // Step 5: Save both documents inside the session
     await agent.save({ session });
     await user.save({ session });

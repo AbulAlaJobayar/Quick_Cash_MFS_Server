@@ -3,9 +3,8 @@ import { Types } from 'mongoose';
 
 export type TJwtPayload = {
   id: Types.ObjectId
-  email: string;
   mobileNumber: string;
-  nid: string;
+  sessionId:string;
   role: string;
 };
 

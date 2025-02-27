@@ -8,6 +8,7 @@ import config from '../../config';
 import { JwtPayload } from 'jsonwebtoken';
 import { sendEmail } from '../../utils/sendEmail';
 import comparPassword from '../../utils/comparPassword';
+import { v4 as uuidv4 } from 'uuid';
 
 //login
 const userLogin = async (payload: TLoginSchema) => {
@@ -35,12 +36,14 @@ const userLogin = async (payload: TLoginSchema) => {
   }
 
   console.log({ isPinMatched });
+ 
 
+  const sessionId = uuidv4(); // Generate a unique session ID
+ 
   const tokenData: TJwtPayload = {
     id: user._id,
-    email: user.email,
     mobileNumber: user.mobileNumber,
-    nid: user.nid,
+    sessionId,
     role: user.accountType,
   };
 
@@ -49,7 +52,7 @@ const userLogin = async (payload: TLoginSchema) => {
     config.jwt_access_secret,
     config.jwt_access_expires_in,
   );
-  user.sessionId = accessToken;
+  user.sessionId = sessionId;
   user.save();
   const refreshToken = createToken(
     tokenData,
@@ -115,9 +118,8 @@ const refreshToken = async (token: string) => {
 
   const tokenData: TJwtPayload = {
     id: user._id,
-    email: user.email,
     mobileNumber: user.mobileNumber,
-    nid: user.nid,
+    sessionId:user.sessionId,
     role: user.accountType,
   };
 
@@ -126,8 +128,6 @@ const refreshToken = async (token: string) => {
     config.jwt_access_secret,
     config.jwt_access_expires_in,
   );
-  user.sessionId = accessToken;
-  user.save();
   return accessToken;
 };
 
@@ -143,9 +143,8 @@ const forgatPassword = async (id: string) => {
 
   const tokenData: TJwtPayload = {
     id: user._id,
-    email: user.email,
+    sessionId:user.sessionId,
     mobileNumber: user.mobileNumber,
-    nid: user.nid,
     role: user.accountType,
   };
 

@@ -11,7 +11,6 @@ const AgentSchema = new Schema<IAgent>(
     }, 
     storeName: { type: String, required: true },
     storeLocation: { type: String, required: true },
-    amount: { type: Number, default: 0 },
     status: {
       type: String,
       enum: ['in-progress', 'approved'],

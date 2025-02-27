@@ -3,6 +3,7 @@ import { Router } from "express";
 import { userRoutes } from "../modules/user/user.route";
 import { AuthRoutes } from "../modules/auth/auth.route";
 import { AgentRoute } from '../modules/agent/agent.route';
+import { TransactionRoute } from "../modules/transaction/transaction.route";
 
 const router=Router()
 const moduleRoute=[
@@ -17,6 +18,10 @@ const moduleRoute=[
     {
         path:"/agent",
         route:AgentRoute
+    },
+    {
+        path:"/transaction",
+        route:TransactionRoute
     }
 ]
 moduleRoute.forEach((route)=>router.use(route.path,route.route))
