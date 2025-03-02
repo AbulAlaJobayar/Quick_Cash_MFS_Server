@@ -12,7 +12,12 @@ const app: Application = express();
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(
+  cors({
+    origin: ['https://quickcash-server.vercel.app'],
+    credentials: true,
+  }),
+);
 // Rate limiting middleware
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes

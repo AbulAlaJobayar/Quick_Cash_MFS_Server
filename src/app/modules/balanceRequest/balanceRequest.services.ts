@@ -27,7 +27,7 @@ const balanceFromAgent = async (
   const result = await BalanceRequest.create(data);
   if (!result) {
     throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
+      httpStatus.BAD_REQUEST,
       'Failed to create balance request',
     );
   }
@@ -70,7 +70,7 @@ const approvedBalanceRequest = async (adminId: string, id: string) => {
 
     if (!updatedRequest) {
       throw new AppError(
-        httpStatus.INTERNAL_SERVER_ERROR,
+        httpStatus.BAD_REQUEST,
         'Failed to update balance request',
       );
     }

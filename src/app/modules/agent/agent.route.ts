@@ -8,13 +8,13 @@ import auth from '../../middleware/auth';
 const router = Router();
 router.post(
   '/create_agent',
-  auth(USER_ROLE.user),
+  auth(USER_ROLE.user,USER_ROLE.admin),
   validateRequest(AgentSchemaValidation.createUserSchema),
   AgentController.createAgent,
 );
-router.get('/', AgentController.getAllAgentFromDB);
+router.get('/',auth(USER_ROLE.admin), AgentController.getAllAgentFromDB);
 router.post(
-  '/approved_agent',
+  '/approved_agent',auth(USER_ROLE.admin),
   validateRequest(AgentSchemaValidation.validateUserSchema),
   AgentController.approvedAgent,
 );

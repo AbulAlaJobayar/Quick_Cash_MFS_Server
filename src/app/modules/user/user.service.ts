@@ -17,7 +17,7 @@ const createUserIntoDB = async (payload: IUser) => {
   console.log(user);
   if (!user) {
     throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
+      httpStatus.BAD_REQUEST,
       'Failed to create user',
     );
   }
@@ -46,7 +46,7 @@ const getUsersFromDB = async () => {
   ]);
   if (!result) {
     throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
+      httpStatus.BAD_REQUEST,
       'Failed to fetch users',
     );
   }
