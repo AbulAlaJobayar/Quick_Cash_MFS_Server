@@ -5,7 +5,8 @@ export const createUserSchema = z.object({
   pin: z.string(),
   mobileNumber: z
     .string()
-    .length(11, { message: 'Mobile number must be exactly 11 digits long' }),
+    .min(10, { message: 'Please enter min 10 digit number' })
+    .max(15, { message: 'Mobile number must be exactly 15 digits long' }),
   email: z.string().email({ message: 'Invalid email format' }),
   nid: z
     .string()

@@ -13,7 +13,7 @@ router.post(
 );
 
 router.get('/',auth(USER_ROLE.admin), UserController.getUsersFromDB);
-router.get('/:id',auth(USER_ROLE.admin,USER_ROLE.agent,USER_ROLE.user), UserController.getUserByIdFromDB);
+router.get('me/:id',auth(USER_ROLE.admin,USER_ROLE.agent,USER_ROLE.user), UserController.getUserByIdFromDB);
 router.put('/delete_user',auth(USER_ROLE.admin), UserController.bulkDeleteFromDB)
 
 //todo: router.put('/:id', UserController.bulkDeleteFromDB)
