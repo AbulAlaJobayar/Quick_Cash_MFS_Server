@@ -1,3 +1,5 @@
+import { isLoggedIn } from './../../../../../quickcash_client/src/service/action/authServices';
+
 import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
@@ -22,24 +24,19 @@ const userLogin = async (payload: TLoginSchema) => {
   if (user.status === 'blocked') {
     throw new AppError(httpStatus.NOT_FOUND, 'User Not Found ');
   }
+  let isLoggedIn = false;
   if (user.sessionId) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      'You are already login on other Device please Logout All Device',
-    );
+    isLoggedIn = true;
   }
   const isPinMatched = comparPassword(payload.pin, user.pin);
   // console.log({ isPasswordMatched }); // Debug log
 
   if (!isPinMatched) {
-    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Your password is incorrect');
   }
 
-  console.log({ isPinMatched });
- 
-
   const sessionId = uuidv4(); // Generate a unique session ID
- 
+
   const tokenData: TJwtPayload = {
     id: user._id,
     mobileNumber: user.mobileNumber,
@@ -62,6 +59,7 @@ const userLogin = async (payload: TLoginSchema) => {
   return {
     accessToken,
     refreshToken,
+    isLoggedIn,
   };
 };
 
@@ -119,7 +117,7 @@ const refreshToken = async (token: string) => {
   const tokenData: TJwtPayload = {
     id: user._id,
     mobileNumber: user.mobileNumber,
-    sessionId:user.sessionId,
+    sessionId: user.sessionId,
     role: user.accountType,
   };
 
@@ -143,7 +141,7 @@ const forgatPassword = async (id: string) => {
 
   const tokenData: TJwtPayload = {
     id: user._id,
-    sessionId:user.sessionId,
+    sessionId: user.sessionId,
     mobileNumber: user.mobileNumber,
     role: user.accountType,
   };
@@ -156,7 +154,7 @@ const forgatPassword = async (id: string) => {
   //localhost:3000?id=A-0001&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
 
   const resetUILink = `${config.reset_pass_ui_link}?id=${user._id}&token${resetToken}`;
-  
+
   sendEmail(
     user.email,
     `
@@ -202,7 +200,7 @@ const forgatPassword = async (id: string) => {
     <p>Hello,</p>
     <p>We received a request to reset your password. Click the button below to reset it:</p>
     <p>
-      <a href="${ resetUILink }" class="button">Reset Password</a>
+      <a href="${resetUILink}" class="button">Reset Password</a>
     </p>
     <p>If you didn't request this, please ignore this email.</p>
     <p>This link will expire in <strong>10 minutes</strong>.</p>
@@ -249,23 +247,17 @@ const resetPassword = async (
   );
 };
 //remove from all device
-const removeFromAllDevice = async (payload:{mobileNumber:string,pin:string}) => {
-  const user = await User.findOneAndUpdate({mobileNumber:payload.mobileNumber}, { sessionId: '' });
-  
+const removeFromAllDevice = async (id: string) => {
+  const user = await User.findOneAndUpdate({ _id: id }, { sessionId: '' });
+
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not Found');
   }
-  console.log(payload.pin,user.pin)
-  const isPasswordMatched=comparPassword(payload.pin, user.pin);
-  console.log(isPasswordMatched)
-  if(!isPasswordMatched){
-    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
-  }
   return null;
 };
-const LogOutFromDevice = async (id:string) => {
-  const user = await User.findByIdAndUpdate({_id:id}, { sessionId: '' });
-  
+const LogOutFromDevice = async (id: string) => {
+  const user = await User.findByIdAndUpdate({ _id: id }, { sessionId: '' });
+
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not Found');
   }
@@ -279,5 +271,5 @@ export const AuthServices = {
   forgatPassword,
   resetPassword,
   removeFromAllDevice,
-  LogOutFromDevice 
+  LogOutFromDevice,
 };

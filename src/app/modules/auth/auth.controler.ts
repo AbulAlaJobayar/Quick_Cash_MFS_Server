@@ -7,7 +7,7 @@ import config from '../../config';
 import AppError from '../../errors/AppError';
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-  const { accessToken, refreshToken } = await AuthServices.userLogin(req.body);
+  const { accessToken, refreshToken,isLoggedIn } = await AuthServices.userLogin(req.body);
   res.cookie('refreshToken', refreshToken, {
     secure: config.NODE_ENV === 'production',
     httpOnly: true,
@@ -18,7 +18,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Login successfully',
-    data: accessToken,
+    data: {accessToken,isLoggedIn},
   });
 });
 
@@ -72,7 +72,8 @@ const resetPassword = catchAsync(async (req, res) => {
   });
 });
 const removeFromAllDevice = catchAsync(async (req, res) => {
-  const result = await AuthServices.removeFromAllDevice(req.body);
+  const { id } = req.body;
+  const result = await AuthServices.removeFromAllDevice(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

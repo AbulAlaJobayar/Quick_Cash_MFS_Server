@@ -22,7 +22,7 @@ router.post('/refresh-token', AuthControllers.refreshToken);
 router.post('/forget-password', AuthControllers.forgetPassword);
 
 router.post('/reset-password', AuthControllers.resetPassword);
-router.post('/remove_all_devices', AuthControllers.removeFromAllDevice);
+router.put('/remove_all_devices', AuthControllers.removeFromAllDevice);
 router.post(
   '/logout',
   auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
