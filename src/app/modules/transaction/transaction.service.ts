@@ -324,8 +324,6 @@ const cashOut = async (id: string, payload: TTransaction) => {
   return { message: 'CashOut successfully' };
 };
 
-
-
 const getTransactionByMe = async (id: string) => {
   // Fetch transactions using aggregation
   const transactions = await Transaction.aggregate([
@@ -414,6 +412,55 @@ const getTransactionFromDB = async () => {
   }
   return result;
 };
+const getTodaysTransaction = async (id: string) => {
+  // todayStart
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  // todyEnd
+  const todayEnd = new Date();
+  todayEnd.setHours(23, 59, 59, 999);
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  if (user.status === 'blocked') {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  const result = await Transaction.aggregate([
+    {
+      $match: {
+        $or: [{ senderId: user.id }, { recipientId: user.id }],
+        createdAt: { $gte: todayStart, $lte: todayEnd },
+      },
+    },
+    {
+      $group: {
+        _id: '$type',
+        totalAmount: { $sum: '$amount' },
+      },
+    },
+  ]);
+// Initialize totals
+const totals = {
+  cashout: 0,
+  sendMoney: 0,
+  cashin: 0,
+};
+
+// Populate totals based on the result
+result.forEach((item) => {
+  if (item._id === "cashout") {
+    totals.cashout = item.totalAmount;
+  } else if (item._id === "sendMoney") {
+    totals.sendMoney = item.totalAmount;
+  } else if (item._id === "cashin") {
+    totals.cashin = item.totalAmount;
+  }
+});
+
+return totals;
+
+};
 
 export const TransactionServices = {
   sendMoney,
@@ -421,4 +468,5 @@ export const TransactionServices = {
   cashOut,
   getTransactionFromDB,
   getTransactionByMe,
+  getTodaysTransaction
 };

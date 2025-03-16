@@ -16,6 +16,11 @@ router.get(
   auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
   TransactionController.getTotalTransactionByMe,
 );
+router.get(
+  '/today_transaction',
+  auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
+  TransactionController.getTodaysTransaction,
+);
 
 router.post(
   '/send_money',

@@ -12,9 +12,22 @@ router.post(
   UserController.createUserIntoDB,
 );
 
-router.get('/',auth(USER_ROLE.admin), UserController.getUsersFromDB);
-router.get('me/:id',auth(USER_ROLE.admin,USER_ROLE.agent,USER_ROLE.user), UserController.getUserByIdFromDB);
-router.put('/delete_user',auth(USER_ROLE.admin), UserController.bulkDeleteFromDB)
+router.get('/', auth(USER_ROLE.admin), UserController.getUsersFromDB);
+router.get(
+  '/user_profile',
+  auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
+  UserController.getMe,
+);
+router.get(
+  'me/:id',
+  auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
+  UserController.getUserByIdFromDB,
+);
+router.put(
+  '/delete_user',
+  auth(USER_ROLE.admin),
+  UserController.bulkDeleteFromDB,
+);
 
 //todo: router.put('/:id', UserController.bulkDeleteFromDB)
 export const userRoutes = router;

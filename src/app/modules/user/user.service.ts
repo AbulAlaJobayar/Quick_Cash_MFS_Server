@@ -63,10 +63,21 @@ const updateUserById = async (payload: Partial<IUser>, id: string) => {
   }
   return user;
 };
+const getMe=async(id:string)=>{
+  const user= await User.findById({_id:id})
+  if(!user){
+    throw new AppError(httpStatus.NOT_FOUND, 'User not Found');
+  }
+  if(user.status==="blocked"){
+    throw new AppError(httpStatus.FORBIDDEN, 'User is blocked');
+  }
+  return user
+}
 export const userService = {
   createUserIntoDB,
   getUsersFromDB,
   getUserByIdFromDB,
   bulkDeleteFromDB,
   updateUserById,
+  getMe
 };

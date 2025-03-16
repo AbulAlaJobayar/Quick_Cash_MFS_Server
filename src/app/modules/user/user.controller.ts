@@ -55,11 +55,23 @@ const updateUserById = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const {id}=req.user
+
+  const result=await userService.getMe(id);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'find your profile successfully',
+    data: result,
+  });
+});
 
 export const UserController = {
   createUserIntoDB,
   getUsersFromDB,
   getUserByIdFromDB,
   bulkDeleteFromDB,
-  updateUserById
+  updateUserById,
+  getMe
 };
