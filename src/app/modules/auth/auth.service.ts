@@ -1,5 +1,3 @@
-import { isLoggedIn } from './../../../../../quickcash_client/src/service/action/authServices';
-
 import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
