@@ -12,7 +12,7 @@ router.get(
   TransactionController.getTransactionFromDB,
 );
 router.get(
-  '/me/:id',
+  '/my_transaction',
   auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
   TransactionController.getTotalTransactionByMe,
 );
@@ -20,6 +20,11 @@ router.get(
   '/today_transaction',
   auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
   TransactionController.getTodaysTransaction,
+);
+router.get(
+  '/monthly',
+  auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
+  TransactionController.getMonthlyTransactionData,
 );
 
 router.post(

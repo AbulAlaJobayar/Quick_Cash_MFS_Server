@@ -6,8 +6,8 @@ import { TTransaction } from './transaction.validation';
 import generateTransactionId from '../../utils/generateTransactionId';
 import { Transaction } from './transaction.model';
 import createNotification from '../../utils/createNotification';
-import { Agent } from '../agent/agent.module';
 import comparPassword from '../../utils/comparPassword';
+
 
 //send money
 const sendMoney = async (id: string, payload: TTransaction) => {
@@ -462,11 +462,40 @@ return totals;
 
 };
 
+const getMonthlyTransactions=async(userId:string)=>{
+  let year= new Date().getFullYear()
+  console.log(year)
+  const startDate = new Date(`${year}-01-01T00:00:00.000Z`);
+  const endDate = new Date(`${year}-12-31T23:59:59.999Z`);
+
+  const transactions = await Transaction.find({
+    $or: [{ senderId: userId }, { recipientId: userId }],
+    createdAt: { $gte: startDate, $lte: endDate },
+  });
+
+  const monthlyData = Array(12)
+    .fill(0)
+    .map((_, index) => ({
+      name: new Date(year, index).toLocaleString('default', { month: 'short' }),
+      totalAmount: 0,
+      totalFees: 0,
+    }));
+
+  transactions.forEach((transaction: any) => {
+    const month = new Date(transaction.createdAt).getMonth();
+    monthlyData[month].totalAmount += transaction.amount;
+    monthlyData[month].totalFees += transaction.fee;
+  });
+
+  return monthlyData;
+}
+
 export const TransactionServices = {
   sendMoney,
   cashIn,
   cashOut,
   getTransactionFromDB,
   getTransactionByMe,
-  getTodaysTransaction
+  getTodaysTransaction,
+  getMonthlyTransactions
 };

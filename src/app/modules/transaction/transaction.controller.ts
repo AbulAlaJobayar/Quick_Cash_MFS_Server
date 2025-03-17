@@ -36,7 +36,7 @@ const cashOut = catchAsync(async (req: Request, res: Response) => {
 });
 const getTotalTransactionByMe = catchAsync(
   async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { id } = req.user;
     const result = await TransactionServices.getTransactionByMe(id);
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -57,7 +57,6 @@ const getTransactionFromDB = catchAsync(async (req: Request, res: Response) => {
 });
 const getTodaysTransaction = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.user;
-  console.log({id})
   const result = await TransactionServices.getTodaysTransaction(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -66,6 +65,19 @@ const getTodaysTransaction = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getMonthlyTransactionData = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.user;
+    console.log(id)
+    const result = await TransactionServices.getMonthlyTransactions(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Monthly Transaction Retrieved successfully',
+      data: result,
+    });
+  },
+);
 
 export const TransactionController = {
   sendMoney,
@@ -74,4 +86,5 @@ export const TransactionController = {
   getTotalTransactionByMe,
   getTransactionFromDB,
   getTodaysTransaction,
+  getMonthlyTransactionData,
 };
