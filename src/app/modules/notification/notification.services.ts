@@ -18,7 +18,7 @@ const getNotificationById = async (userId: string) => {
   return notification;
 };
 
-const getUnreadNotificationCount = async (userId: string): Promise<number> => {
+const getUnreadNotificationCount = async (userId: string) => {
   // Find the user
   const user = await User.findById({ _id: userId });
   if (!user) {
@@ -26,24 +26,21 @@ const getUnreadNotificationCount = async (userId: string): Promise<number> => {
   }
 
   // Count the number of unread notifications for the user
-  const unreadNotificationCount = await Notification.countDocuments({
-    userId: user._id,
+
+  const unreadNotifications = await Notification.find({
+    userId: userId,
     isRead: false,
+  }).sort({
+    createdAt: -1,
   });
 
-  return unreadNotificationCount; // Return the count of unread notifications
+  return unreadNotifications;
 };
 
 const markAsRead = async (userId: string, notificationId: string) => {
-  // Find the user
-  const user = await User.findById({ _id: userId });
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User Not Found');
-  }
-
-  // Find and update the notification
-  const notification = await Notification.findByIdAndUpdate(
-    notificationId,
+  console.log(userId, notificationId);
+  const notification = await Notification.findOneAndUpdate(
+    { _id: notificationId, userId },
     { isRead: true },
     { new: true },
   ).populate('userId');
@@ -51,15 +48,43 @@ const markAsRead = async (userId: string, notificationId: string) => {
   if (!notification) {
     throw new AppError(httpStatus.NOT_FOUND, 'Notification Not Found');
   }
-  const transaction = await Transaction.findOne({
-    transactionId: notification.transactionId,
-  })
+
+  // Fetch transaction if transactionId exists
+  let transaction = null;
+  if (notification.transactionId) {
+    transaction = await Transaction.findOne({
+      transactionId: notification.transactionId,
+    });
+  }
 
   return { notification, transaction }; // Return the updated notification
+};
+const getNotificationDetailsById = async (id: string) => {
+  const result = await Notification.findById(id).populate('userId').exec();
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Notification not found');
+  }
+
+  // Fetch the associated transaction
+  const transaction = await Transaction.findOne({
+    transactionId: result.transactionId,
+  }).exec();
+
+  if (!transaction) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Transaction not found');
+  }
+
+  // Return a combined object
+  return {
+    notification: result,
+    transaction,
+  };
 };
 
 export const NotificationService = {
   getNotificationById,
   getUnreadNotificationCount,
   markAsRead,
+  getNotificationDetailsById,
 };

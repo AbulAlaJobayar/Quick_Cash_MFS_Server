@@ -14,9 +14,14 @@ router.get(
   auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
   NotificationController.getUnreadNotificationCount,
 );
+router.get(
+  '/:id/notification_Details',
+  auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
+  NotificationController.getNotificationDetailsById,
+);
 
 router.put(
-  '/mark_read',
+  '/:id/mark_as_read',
   auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
   NotificationController.markAsRead
 );

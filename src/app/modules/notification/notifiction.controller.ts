@@ -28,7 +28,8 @@ const getUnreadNotificationCount = catchAsync(
 );
 const markAsRead = catchAsync(async (req: Request, res: Response) => {
   const { id: userId } = req.user;
-  const { id } = req.body;
+  const { id } = req.params;
+  console.log(id)
   const result = await NotificationService.markAsRead(userId, id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -37,9 +38,20 @@ const markAsRead = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getNotificationDetailsById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await NotificationService.getNotificationDetailsById( id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'get Notification successfully',
+    data: result,
+  });
+});
 
 export const NotificationController = {
   getTransactionFromDB,
   getUnreadNotificationCount,
-  markAsRead
+  markAsRead,
+  getNotificationDetailsById
 };

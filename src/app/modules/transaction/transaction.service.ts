@@ -8,7 +8,6 @@ import { Transaction } from './transaction.model';
 import createNotification from '../../utils/createNotification';
 import comparPassword from '../../utils/comparPassword';
 
-
 //send money
 const sendMoney = async (id: string, payload: TTransaction) => {
   const { mobileNumber, amount, pin } = payload;
@@ -413,24 +412,27 @@ const getTransactionFromDB = async () => {
   return result;
 };
 const getTodaysTransaction = async (id: string) => {
-  // todayStart
+  // Today Start & End (Using UTC)
   const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  // todyEnd
+  todayStart.setUTCHours(0, 0, 0, 0);
   const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
+  todayEnd.setUTCHours(23, 59, 59, 999);
+
+  // Find User
   const user = await User.findById(id);
-  if (!user) {
+  if (!user || user.status === 'blocked') {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-  if (user.status === 'blocked') {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-  }
+
+  // Convert user.id to ObjectId
+  const userId = new mongoose.Types.ObjectId(String(user.id));
+
+  // Aggregation Query
   const result = await Transaction.aggregate([
     {
       $match: {
-        $or: [{ senderId: user.id }, { recipientId: user.id }],
-        createdAt: { $gte: todayStart, $lte: todayEnd },
+        $or: [{ senderId: userId }, { recipientId: userId }],
+        createdAt: { $gte: todayStart, $lte: todayEnd }, // Ensure correct date filtering
       },
     },
     {
@@ -440,31 +442,23 @@ const getTodaysTransaction = async (id: string) => {
       },
     },
   ]);
-// Initialize totals
-const totals = {
-  cashout: 0,
-  sendMoney: 0,
-  cashin: 0,
+  console.log({ result });
+  // Initialize Totals
+  const totals = { cashout: 0, sendMoney: 0, cashin: 0 };
+
+  // Map Results to Totals
+  result.forEach((item) => {
+    if (item._id === 'cashOut') totals.cashout = item.totalAmount;
+    if (item._id === 'sendMoney') totals.sendMoney = item.totalAmount;
+    if (item._id === 'cashIn') totals.cashin = item.totalAmount;
+  });
+
+  return totals;
 };
 
-// Populate totals based on the result
-result.forEach((item) => {
-  if (item._id === "cashout") {
-    totals.cashout = item.totalAmount;
-  } else if (item._id === "sendMoney") {
-    totals.sendMoney = item.totalAmount;
-  } else if (item._id === "cashin") {
-    totals.cashin = item.totalAmount;
-  }
-});
-
-return totals;
-
-};
-
-const getMonthlyTransactions=async(userId:string)=>{
-  let year= new Date().getFullYear()
-  console.log(year)
+const getMonthlyTransactions = async (userId: string) => {
+  let year = new Date().getFullYear();
+  console.log(year);
   const startDate = new Date(`${year}-01-01T00:00:00.000Z`);
   const endDate = new Date(`${year}-12-31T23:59:59.999Z`);
 
@@ -488,7 +482,7 @@ const getMonthlyTransactions=async(userId:string)=>{
   });
 
   return monthlyData;
-}
+};
 
 export const TransactionServices = {
   sendMoney,
@@ -497,5 +491,5 @@ export const TransactionServices = {
   getTransactionFromDB,
   getTransactionByMe,
   getTodaysTransaction,
-  getMonthlyTransactions
+  getMonthlyTransactions,
 };
