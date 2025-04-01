@@ -43,6 +43,10 @@ const userSchema = new Schema<IUser>(
       type: Number,
       default: 0, // Ensure initial bonus is set
     },
+    img: {
+      type: String,
+      default:null
+    },
     status: {
       type: String,
       enum: ['blocked', 'approved'],

@@ -20,9 +20,16 @@ const balanceFromAgent = async (
   if (user.accountType !== 'agent') {
     throw new AppError(httpStatus.FORBIDDEN, 'User is not an agent');
   }
+  const admin = await User.findOne({ status: 'admin' });
+
+  if (!admin) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Admin Not Found');
+  }
+  const transactionId = generateTransactionId();
   const data = {
     agentId: user._id,
     amount: payload.amount,
+    transactionId,
   };
   const result = await BalanceRequest.create(data);
   if (!result) {
@@ -31,6 +38,20 @@ const balanceFromAgent = async (
       'Failed to create balance request',
     );
   }
+
+  // Notify the sender
+  await createNotification(
+    user._id.toString(),
+    transactionId,
+    `You Requested ${result.amount} taka. please wait for admin Approved`,
+  );
+
+  // Notify the admin
+  await createNotification(
+    admin._id.toString(),
+    transactionId,
+    `Transaction ID: ${transactionId} - ${user.mobileNumber} Request balance ${result.amount} Taka. waiting for your Approval`,
+  );
   return result;
 };
 
@@ -39,12 +60,12 @@ const approvedBalanceRequest = async (adminId: string, id: string) => {
   session.startTransaction();
 
   try {
-    console.log('request fail')
-    const request = await BalanceRequest.findById({_id:id}).session(session);
+    console.log('request fail');
+    const request = await BalanceRequest.findById({ _id: id }).session(session);
     if (!request) {
       throw new AppError(httpStatus.NOT_FOUND, 'Request Money Not Found');
     }
-    console.log("request passs")
+    console.log('request passs');
 
     if (request.status === 'approved') {
       throw new AppError(

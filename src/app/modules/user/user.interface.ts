@@ -9,6 +9,7 @@ export interface IUser {
   nid: string;
   balance: number;
   bonus:number;
+  img?:string;
   status: 'blocked' | 'approved';
   sessionId: string ;
 }

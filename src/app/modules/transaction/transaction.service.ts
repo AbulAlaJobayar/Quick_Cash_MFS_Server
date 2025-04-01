@@ -335,6 +335,9 @@ const getTransactionByMe = async (id: string) => {
         ],
       },
     },
+    {
+      $sort: { createdAt: -1 }, // Sort by newest first
+    },
     // Lookup sender details from the User collection
     {
       $lookup: {
@@ -412,12 +415,6 @@ const getTransactionFromDB = async () => {
   return result;
 };
 const getTodaysTransaction = async (id: string) => {
-  // Today Start & End (Using UTC)
-  const todayStart = new Date();
-  todayStart.setUTCHours(0, 0, 0, 0);
-  const todayEnd = new Date();
-  todayEnd.setUTCHours(23, 59, 59, 999);
-
   // Find User
   const user = await User.findById(id);
   if (!user || user.status === 'blocked') {
@@ -432,7 +429,6 @@ const getTodaysTransaction = async (id: string) => {
     {
       $match: {
         $or: [{ senderId: userId }, { recipientId: userId }],
-        createdAt: { $gte: todayStart, $lte: todayEnd }, // Ensure correct date filtering
       },
     },
     {
@@ -478,7 +474,7 @@ const getMonthlyTransactions = async (userId: string) => {
   transactions.forEach((transaction: any) => {
     const month = new Date(transaction.createdAt).getMonth();
     monthlyData[month].totalAmount += transaction.amount;
-    monthlyData[month].totalFees += transaction.fee;
+    monthlyData[month].totalFees += transaction.fee.toFixed(2);
   });
 
   return monthlyData;

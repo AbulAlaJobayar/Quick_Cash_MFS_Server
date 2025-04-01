@@ -24,9 +24,9 @@ router.get(
   UserController.getUserByIdFromDB,
 );
 router.put(
-  '/delete_user',
-  auth(USER_ROLE.admin),
-  UserController.bulkDeleteFromDB,
+  '/user_update',
+  auth(USER_ROLE.admin,USER_ROLE.agent,USER_ROLE.user),
+  UserController.updateUserById,
 );
 
 //todo: router.put('/:id', UserController.bulkDeleteFromDB)

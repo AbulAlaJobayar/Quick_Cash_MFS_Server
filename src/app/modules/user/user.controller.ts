@@ -45,7 +45,8 @@ const bulkDeleteFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const updateUserById = catchAsync(async (req: Request, res: Response) => {
-  const {id}=req.params
+  const {id}=req.user
+  console.log(id)
  
   const result=await userService.updateUserById(req.body,id);
   sendResponse(res, {

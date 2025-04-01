@@ -54,6 +54,7 @@ const bulkDeleteFromDB = async (id: string) => {
   return result;
 };
 const updateUserById = async (payload: Partial<IUser>, id: string) => {
+  console.log("user id",id)
   const user = await User.findByIdAndUpdate({ _id: id }, payload, {
     new: true,
     runValidators: true,

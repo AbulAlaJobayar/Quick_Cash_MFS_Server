@@ -11,6 +11,7 @@ const balanceRequestSchema = new Schema<IBalanceRequest>(
       default: 'pending',
     },
     adminId: { type: Schema.Types.ObjectId, ref: 'User',required:false },
+    transactionId:{type:String, required:true}
   },
   { timestamps: true },
 );
