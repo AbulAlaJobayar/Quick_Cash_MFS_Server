@@ -78,6 +78,19 @@ const getMonthlyTransactionData = catchAsync(
     });
   },
 );
+const getTransactionById = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    console.log(id)
+    const result = await TransactionServices.getTransactionById(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Transaction Retrieved successfully',
+      data: result,
+    });
+  },
+);
 
 export const TransactionController = {
   sendMoney,
@@ -87,4 +100,5 @@ export const TransactionController = {
   getTransactionFromDB,
   getTodaysTransaction,
   getMonthlyTransactionData,
+  getTransactionById
 };

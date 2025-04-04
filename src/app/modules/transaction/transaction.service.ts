@@ -383,23 +383,38 @@ const getTransactionByMe = async (id: string) => {
         type: 1,
         transactionId: 1,
         createdAt: 1,
+        updatedAt: 1,
         sender: {
           _id: 1,
           name: 1,
           mobileNumber: 1,
           accountType: 1,
+          nid:1,
+          balance: 1,
+          status: 1,
+          accountStatus: 1,
+          
+
         },
         recipient: {
           _id: 1,
           name: 1,
           mobileNumber: 1,
           accountType: 1,
+          nid:1,
+          balance: 1,
+          status: 1,
+          accountStatus: 1,
         },
         admin: {
           _id: 1,
           name: 1,
           mobileNumber: 1,
           accountType: 1,
+          nid:1,
+          balance: 1,
+          status: 1,
+          accountStatus: 1,
         },
       },
     },
@@ -480,6 +495,13 @@ const getMonthlyTransactions = async (userId: string) => {
   return monthlyData;
 };
 
+const getTransactionById=async(id:string)=>{
+  const transaction = await Transaction.findById(id).populate('senderId recipientId adminId');
+  if (!transaction) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Transaction not found');
+  }
+  return transaction;
+}
 export const TransactionServices = {
   sendMoney,
   cashIn,
@@ -488,4 +510,5 @@ export const TransactionServices = {
   getTransactionByMe,
   getTodaysTransaction,
   getMonthlyTransactions,
+  getTransactionById
 };

@@ -45,6 +45,11 @@ router.post(
   validateRequest(transactionValidationSchema.transactionSchema),
   TransactionController.cashOut,
 );
+router.get(
+  '/single/:id',
+  auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.agent),
+  TransactionController.getTransactionById,
+);
 
 
 
