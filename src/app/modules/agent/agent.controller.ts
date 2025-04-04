@@ -26,8 +26,8 @@ const getAllAgentFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const approvedAgent = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.body;
-  const result = await AgentServices.approvedAgent(id);
+
+  const result = await AgentServices.approvedAgent(req.body );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

@@ -20,7 +20,7 @@ const balanceFromAgent = async (
   if (user.accountType !== 'agent') {
     throw new AppError(httpStatus.FORBIDDEN, 'User is not an agent');
   }
-  const admin = await User.findOne({ status: 'admin' });
+  const admin = await User.findOne({ accountType:'admin' });
 
   if (!admin) {
     throw new AppError(httpStatus.NOT_FOUND, 'Admin Not Found');
@@ -55,17 +55,15 @@ const balanceFromAgent = async (
   return result;
 };
 
-const approvedBalanceRequest = async (adminId: string, id: string) => {
+const approvedBalanceRequest = async (adminId: string, payload:{id:string,status:string}) => {
   const session = await mongoose.startSession();
   session.startTransaction();
-
+const {id,status}=payload
   try {
-    console.log('request fail');
     const request = await BalanceRequest.findById({ _id: id }).session(session);
     if (!request) {
       throw new AppError(httpStatus.NOT_FOUND, 'Request Money Not Found');
     }
-    console.log('request passs');
 
     if (request.status === 'approved') {
       throw new AppError(
@@ -83,8 +81,8 @@ const approvedBalanceRequest = async (adminId: string, id: string) => {
     const updatedRequest = await BalanceRequest.findByIdAndUpdate(
       id,
       {
-        status: 'approved',
-        adminId: adminId,
+        status,
+        adminId: admin._id,
       },
       { new: true, session }, // Return the updated document and use the session
     );
@@ -114,13 +112,13 @@ const approvedBalanceRequest = async (adminId: string, id: string) => {
     await createNotification(
       user._id.toString(),
       transactionId,
-      `Your request is approved your requested Money is ${request.amount} to add your balance`,
+      `Your request is  ${updatedRequest?.status} your requested Money is ${request.amount} `,
     );
     // send admin
     await createNotification(
       adminId.toString(),
       transactionId,
-      `You approved ${user.name} request `,
+      `You ${updatedRequest?.status} ${user?.name} request `,
     );
 
     return updatedRequest;
@@ -130,7 +128,35 @@ const approvedBalanceRequest = async (adminId: string, id: string) => {
     throw error;
   }
 };
+const getMyBalanceRequestFromDB=async(userId:string)=>{
+ // Validate input
+ if (!userId || typeof userId !== 'string') {
+  throw new AppError(httpStatus.BAD_REQUEST, 'Invalid user ID');
+}
+
+// Find user with proper error handling
+const user = await User.findById(userId).lean();
+if (!user) {
+  throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+}
+
+// Fetch balance requests with projection for efficiency
+const balanceRequests = await BalanceRequest.find({
+  $or: [
+    { agentId: user._id },
+    { adminId: user._id },
+  ]
+}).populate("agentId").populate("adminId").lean();
+
+return balanceRequests;
+}
+const totalBalanceRequest=async()=>{
+  const balanceRequests = await BalanceRequest.find().populate("agentId").populate("adminId").lean()
+  return balanceRequests
+}
 export const balanceRequestService = {
   balanceFromAgent,
   approvedBalanceRequest,
+  getMyBalanceRequestFromDB,
+  totalBalanceRequest
 };

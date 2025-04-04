@@ -13,7 +13,7 @@ const AgentSchema = new Schema<IAgent>(
     storeLocation: { type: String, required: true },
     status: {
       type: String,
-      enum: ['in-progress', 'approved'],
+      enum: ['in-progress', 'approved', 'rejected'],
       default: 'in-progress',
     },
   },

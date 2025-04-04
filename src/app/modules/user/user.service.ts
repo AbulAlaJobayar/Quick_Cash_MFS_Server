@@ -22,14 +22,12 @@ const createUserIntoDB = async (payload: IUser) => {
 
 //get all users from db
 const getUsersFromDB = async () => {
-  const result = await User.aggregate([
-    { $match: { status: 'approved' } },
-    { $project: { pin: 0 } },
-  ]);
-  if (!result) {
+  const users = await User.find({}).select('-pin');
+  if (!users) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to fetch users');
   }
-  return result;
+
+  return users;
 };
 
 //get user by id
@@ -44,17 +42,16 @@ const getUserByIdFromDB = async (id: string) => {
   return user;
 };
 
-const bulkDeleteFromDB = async (id: string) => {
-  console.log('services id', id);
+const bulkDeleteFromDB = async (payload:{id:string; status:"approved"|"blocked"}) => {
   const result = await User.findByIdAndUpdate(
-    { _id: id },
-    { status: 'blocked' },
+    { _id: payload.id },
+    { status: payload.status},
     { new: true },
   ).select('-pin');
   return result;
 };
 const updateUserById = async (payload: Partial<IUser>, id: string) => {
-  console.log("user id",id)
+  console.log('user id', id);
   const user = await User.findByIdAndUpdate({ _id: id }, payload, {
     new: true,
     runValidators: true,
@@ -64,21 +61,21 @@ const updateUserById = async (payload: Partial<IUser>, id: string) => {
   }
   return user;
 };
-const getMe=async(id:string)=>{
-  const user= await User.findById({_id:id})
-  if(!user){
+const getMe = async (id: string) => {
+  const user = await User.findById({ _id: id });
+  if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not Found');
   }
-  if(user.status==="blocked"){
+  if (user.status === 'blocked') {
     throw new AppError(httpStatus.FORBIDDEN, 'User is blocked');
   }
-  return user
-}
+  return user;
+};
 export const userService = {
   createUserIntoDB,
   getUsersFromDB,
   getUserByIdFromDB,
   bulkDeleteFromDB,
   updateUserById,
-  getMe
+  getMe,
 };

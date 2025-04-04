@@ -34,9 +34,9 @@ const getUserByIdFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const bulkDeleteFromDB = catchAsync(async (req: Request, res: Response) => {
-  const {id}=req.body
+  
  
-  const result=await userService.bulkDeleteFromDB(id);
+  const result=await userService.bulkDeleteFromDB(req.body);
   sendResponse(res, {
     statusCode: status.OK,
     success: true,

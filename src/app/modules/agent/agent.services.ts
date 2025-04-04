@@ -1,4 +1,4 @@
-import httpStatus from 'http-status';
+import httpStatus, { status } from 'http-status';
 import AppError from '../../errors/AppError';
 import { IAgent } from './agent.interface';
 import { Agent } from './agent.module';
@@ -23,6 +23,7 @@ const createAnAgent = async (id: string, payload: IAgent) => {
     );
   }
   payload.userId = user._id as any;
+  payload.status = 'in-progress';
   const agent = await Agent.create(payload);
   if (!agent) {
     throw new AppError(httpStatus.NOT_FOUND, 'Agent can not create');
@@ -46,29 +47,33 @@ const getAllAgentFromDB = async () => {
 };
 // Assuming roles are defined here
 
-const approvedAgent = async (id: string) => {
+const approvedAgent = async ( payload: { id:string,status: string }) => {
   const session = await mongoose.startSession(); // Start transaction session
   session.startTransaction();
 
   try {
-    // Step 1: Find the user inside the transaction
-    const user = await User.findById({ _id: id }).session(session);
-
-    if (!user) {
-      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-    }
-    if (user.status === 'blocked') {
-      throw new AppError(httpStatus.FORBIDDEN, 'User is deleted');
-    }
-    console.log('user', user);
-    // Step 2: Find the agent inside the transaction
-    const agent = await Agent.findOne({ userId: user._id }).session(session);
+    
+    // Step 1: Find the agent inside the transaction
+    const agent = await Agent.findOne({ _id: payload.id }).session(session);
     if (!agent) {
       throw new AppError(httpStatus.NOT_FOUND, 'Agent not found');
     }
-    console.log('agent', agent);
+    // Step 2: Find the user inside the transaction
+    const user = await User.findOne({ _id: agent.userId }).session(session);
+    if(!user){
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+     }
+    if(user.status==="blocked"){
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+     }
     // Step 3: Update the agent status
-    agent.status = 'approved';
+
+    if (agent.status && payload.status === 'approved') {
+      agent.status = 'approved';
+    }
+    if (agent.status && payload.status === 'rejected') {
+      agent.status = 'rejected';
+    }
 
     // Step 4: Update the user role
     user.accountType = USER_ROLE.agent;

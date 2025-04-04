@@ -1,3 +1,4 @@
+
 import { Router } from 'express';
 import { UserController } from './user.controller';
 import validateRequest from '../../middleware/validateRequest';
@@ -12,7 +13,7 @@ router.post(
   UserController.createUserIntoDB,
 );
 
-router.get('/', auth(USER_ROLE.admin), UserController.getUsersFromDB);
+router.get('/all_users', auth(USER_ROLE.admin), UserController.getUsersFromDB);
 router.get(
   '/user_profile',
   auth(USER_ROLE.admin, USER_ROLE.agent, USER_ROLE.user),
@@ -29,5 +30,5 @@ router.put(
   UserController.updateUserById,
 );
 
-//todo: router.put('/:id', UserController.bulkDeleteFromDB)
+router.put('/user_delete',auth(USER_ROLE.admin), UserController.bulkDeleteFromDB)
 export const userRoutes = router;

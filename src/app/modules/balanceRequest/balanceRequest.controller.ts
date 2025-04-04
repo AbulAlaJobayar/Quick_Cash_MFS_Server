@@ -15,20 +15,49 @@ const createBalanceRequest = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const approvedBalanceRequest = catchAsync(async (req: Request, res: Response) => {
-  const { id:adminId} = req.user;
-  const {id:requestId}=req.body
+const approvedBalanceRequest = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id} = req.user;
 
-  const result = await balanceRequestService.approvedBalanceRequest(adminId, requestId);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Balance Update successfully',
-    data: result,
-  });
-});
+    const result = await balanceRequestService.approvedBalanceRequest(
+      id,
+      req.body
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Balance Update successfully',
+      data: result,
+    });
+  },
+);
+const getMyBalanceRequestFromDB = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.user;
+    const result = await balanceRequestService.getMyBalanceRequestFromDB(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Balance Request Retrieved successfully',
+      data: result,
+    });
+  },
+);
+const totalBalanceRequest = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await balanceRequestService.totalBalanceRequest()
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Balance Request Retrieved successfully',
+      data: result,
+    });
+  },
+);
 
 export const balanceRequestController = {
   createBalanceRequest,
-  approvedBalanceRequest
+  approvedBalanceRequest,
+  getMyBalanceRequestFromDB,
+  totalBalanceRequest
 };

@@ -28,7 +28,7 @@ app.use(
 // Rate limiting (for API routes only)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 10000, // Limit each IP to 10000 requests per windowMs
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
   legacyHeaders: false, // Disable `X-RateLimit-*` headers
@@ -46,7 +46,7 @@ app.use(cookieParser());
 // CORS configuration (strict for security)
 app.use(
   cors({
-    origin: ['http://localhost:3000'], // Allow only your frontend
+    origin: ['http://localhost:3000','https://quickcash-amber.vercel.app'], // Allow only your frontend
     credentials: true, // Enable cookies/auth headers
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Allowed methods
   }),

@@ -4,5 +4,5 @@ export interface IAgent{
     userId:Types.ObjectId;
     storeName:string;
     storeLocation:string;
-    status:"in-progress"|"approved"
+    status:"in-progress"|"approved"|"rejected"
 }
