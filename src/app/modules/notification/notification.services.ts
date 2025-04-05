@@ -60,7 +60,7 @@ const markAsRead = async (userId: string, notificationId: string) => {
   return { notification, transaction }; // Return the updated notification
 };
 const getNotificationDetailsById = async (id: string) => {
-  const result = await Notification.findById(id).populate('userId').exec();
+  const result = await Notification.findById({_id:id}).populate('userId').exec();
 
   if (!result) {
     throw new AppError(httpStatus.NOT_FOUND, 'Notification not found');
@@ -76,10 +76,7 @@ const getNotificationDetailsById = async (id: string) => {
   }
 
   // Return a combined object
-  return {
-    notification: result,
-    transaction,
-  };
+  return result;
 };
 
 export const NotificationService = {

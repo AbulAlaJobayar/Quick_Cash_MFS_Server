@@ -44,6 +44,9 @@ const balanceFromAgent = async (
     user._id.toString(),
     transactionId,
     `You Requested ${result.amount} taka. please wait for admin Approved`,
+     result.amount,
+    0
+    
   );
 
   // Notify the admin
@@ -51,6 +54,9 @@ const balanceFromAgent = async (
     admin._id.toString(),
     transactionId,
     `Transaction ID: ${transactionId} - ${user.mobileNumber} Request balance ${result.amount} Taka. waiting for your Approval`,
+    result.amount,
+    0
+    
   );
   return result;
 };
@@ -113,12 +119,18 @@ const {id,status}=payload
       user._id.toString(),
       transactionId,
       `Your request is  ${updatedRequest?.status} your requested Money is ${request.amount} `,
+      request.amount,
+      0
+      
     );
     // send admin
     await createNotification(
       adminId.toString(),
       transactionId,
       `You ${updatedRequest?.status} ${user?.name} request `,
+      request.amount,
+      0
+      
     );
 
     return updatedRequest;

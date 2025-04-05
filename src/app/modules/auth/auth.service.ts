@@ -128,8 +128,8 @@ const refreshToken = async (token: string) => {
 };
 
 //forgat password
-const forgatPassword = async (id: string) => {
-  const user = await User.findById({ _id: id });
+const forgatPassword = async (mobileNumber:string) => {
+  const user = await User.findOne({mobileNumber});
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not Found');
   }

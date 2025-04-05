@@ -89,9 +89,13 @@ const sendMoney = async (id: string, payload: TTransaction) => {
 
     // Notify the sender
     await createNotification(
-      sender._id.toString(),
-      transactionId,
-      `You sent ${amount} taka to ${recipient.mobileNumber}. Fee: ${fee} taka.`,
+    sender._id.toString(),
+    transactionId,
+    `You sent ${amount} taka to ${recipient.mobileNumber}. Fee: ${fee} taka.`,
+     amount,
+     fee,
+     
+ 
     );
 
     // Notify the recipient
@@ -100,12 +104,18 @@ const sendMoney = async (id: string, payload: TTransaction) => {
       recipient._id.toString(),
       transactionId,
       `You received ${amount} taka from ${sender.mobileNumber}.`,
+      amount,
+      fee
+      
+      
     );
     // Notify the admin
     await createNotification(
       admin._id.toString(),
       transactionId,
       `Transaction ID: ${transactionId} -${sender.mobileNumber}sent ${amount} Taka to  Mobile:${recipient.mobileNumber}. you received ${fee} Taka as a Admin fee.`,
+      amount,
+      fee
     );
   } catch (error) {
     // Abort the transaction if any operation fails
@@ -184,6 +194,9 @@ const cashIn = async (id: string, payload: TTransaction) => {
       sender._id.toString(),
       transactionId,
       `You send cashIn ${amount} taka to ${recipient.mobileNumber}. Fee: ${fee} taka.`,
+      amount,
+      fee
+  
     );
 
     // Notify the recipient
@@ -192,12 +205,18 @@ const cashIn = async (id: string, payload: TTransaction) => {
       recipient._id.toString(),
       transactionId,
       `You received cashIn from ${amount} taka from ${sender.mobileNumber}.`,
+      amount,
+      fee
+     
     );
     // Notify the admin
     await createNotification(
       admin._id.toString(),
       transactionId,
       `Transaction ID: ${transactionId} - ${sender.mobileNumber} sent ${amount} Taka to ${recipient.mobileNumber}. you received ${fee} Taka as a fee.`,
+      amount,
+      fee
+      
     );
   } catch (error) {
     // Abort the transaction if any operation fails
@@ -298,13 +317,17 @@ const cashOut = async (id: string, payload: TTransaction) => {
       sender._id.toString(),
       transactionId,
       `You cashed out ${amount} taka to ${recipient.mobileNumber}. CashOut Charge: ${cashoutCharge} taka.`,
-    );
+      amount,
+      cashoutCharge);
 
     // Notify the recipient (agent)
     await createNotification(
       recipient._id.toString(),
       transactionId,
       `You received ${amount} taka from ${sender.mobileNumber}. Agent Fee: ${agentFee} taka.`,
+      amount,
+      cashoutCharge
+      
     );
 
     // Notify the admin
@@ -312,6 +335,9 @@ const cashOut = async (id: string, payload: TTransaction) => {
       admin._id.toString(),
       transactionId,
       `Transaction ID: ${transactionId} - ${sender.mobileNumber} cashed out ${amount} Taka to ${recipient.mobileNumber}. You received ${adminFee} Taka as a Admen fee.`,
+      amount,
+      cashoutCharge
+      
     );
   } catch (error) {
     // Abort the transaction if any operation fails
