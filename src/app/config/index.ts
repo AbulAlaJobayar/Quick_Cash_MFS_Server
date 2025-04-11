@@ -12,6 +12,7 @@ export default {
     jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN,
     jwt_reset_expire_in:process.env.JWT_RESET_EXPIRES_IN,
     reset_pass_ui_link:process.env.RESET_PASS_UI_LINK,
+    resetExpiresIn:process.env.RESET_EXPIRES_IN,
     nodemailer_email:process.env.NODEMAILER_EMAIL,
     nodemailer_app_pass:process.env.NODEMAILER_APP_PASS
   };

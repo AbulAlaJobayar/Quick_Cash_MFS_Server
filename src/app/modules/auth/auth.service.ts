@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 import { createToken, TJwtPayload, verifyToken } from '../../utils/tokenUtils';
 import config from '../../config';
 import { JwtPayload } from 'jsonwebtoken';
-import { sendEmail } from '../../utils/sendEmail';
+import { sendEmail, sendPasswordResetEmail } from '../../utils/sendEmail';
 import comparPassword from '../../utils/comparPassword';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -128,8 +128,8 @@ const refreshToken = async (token: string) => {
 };
 
 //forgat password
-const forgatPassword = async (mobileNumber:string) => {
-  const user = await User.findOne({mobileNumber});
+const forgatPassword = async (payload:{email:string}) => {
+  const user = await User.findOne({email:payload.email});
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not Found');
   }
@@ -151,73 +151,21 @@ const forgatPassword = async (mobileNumber:string) => {
   );
   //localhost:3000?id=A-0001&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
 
-  const resetUILink = `${config.reset_pass_ui_link}?id=${user._id}&token${resetToken}`;
-
-  sendEmail(
-    user.email,
-    `
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Password Reset</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 20px auto;
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .button {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: #ffffff !important;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-    .footer {
-      margin-top: 20px;
-      font-size: 12px;
-      color: #666;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Password Reset Request</h2>
-    <p>Hello,</p>
-    <p>We received a request to reset your password. Click the button below to reset it:</p>
-    <p>
-      <a href="${resetUILink}" class="button">Reset Password</a>
-    </p>
-    <p>If you didn't request this, please ignore this email.</p>
-    <p>This link will expire in <strong>10 minutes</strong>.</p>
-    <div class="footer">
-      <p>Best regards,</p>
-      <p>Quick Cash Team</p>
-    </div>
-  </div>
-</body>
-</html>
-    
-    `,
-  );
+  const resetUILink = `${config.reset_pass_ui_link}?id=${user._id}&token=${resetToken}`;
+  sendPasswordResetEmail(user.email, {
+    name: user.name || 'User',
+    resetLink: resetUILink,
+    expiryTime: config.resetExpiresIn,
+  })
+  
   console.log(resetUILink);
+  return null
 };
 const resetPassword = async (
   payload: { id: string; newPin: string },
   token: string,
 ) => {
+  console.log(payload)
   const user = await User.findById({ _id: payload.id });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not Found');
@@ -243,7 +191,10 @@ const resetPassword = async (
       pin: newHashedPin,
     },
   );
+  return null;
 };
+
+
 //remove from all device
 const removeFromAllDevice = async (id: string) => {
   const user = await User.findOneAndUpdate({ _id: id }, { sessionId: '' });

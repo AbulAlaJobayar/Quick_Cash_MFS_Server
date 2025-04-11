@@ -46,7 +46,7 @@ app.use(cookieParser());
 // CORS configuration (strict for security)
 app.use(
   cors({
-    origin: ['http://localhost:3000','https://quickcash-amber.vercel.app'], // Allow only your frontend
+    origin: ['http://localhost:3000','https://quickcash-client.vercel.app'], 
     credentials: true, // Enable cookies/auth headers
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Allowed methods
   }),
