@@ -5,6 +5,7 @@ import { AgentRoute } from '../modules/agent/agent.route';
 import { TransactionRoute } from '../modules/transaction/transaction.route';
 import { NotificationRoute } from '../modules/notification/notification.route';
 import { balanceRequestRouter } from '../modules/balanceRequest/balanceRequest.route';
+import { OfferRouter } from '../modules/offer/offer.route';
 
 const router = Router();
 const moduleRoute = [
@@ -31,6 +32,10 @@ const moduleRoute = [
   {
     path: '/balanceRequest',
     route: balanceRequestRouter,
+  },
+  {
+    path: '/offer',
+    route: OfferRouter,
   },
 ];
 moduleRoute.forEach((route) => router.use(route.path, route.route));
